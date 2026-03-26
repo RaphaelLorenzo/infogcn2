@@ -124,7 +124,7 @@ class Feeder(Dataset):
             value = scalerValue[:,:,:]
             length = value.shape[0]
 
-            idx = np.linspace(0,length-1,self.window_size).astype(np.int)
+            idx = np.linspace(0,length-1,self.window_size).astype(np.int32)
             data[:,:,:] = value[idx,:,:] # T,V,C
 
         if 'bone' in self.data_path:

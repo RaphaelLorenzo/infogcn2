@@ -1,0 +1,5 @@
+data/NW-UCLA/
+data/nturgbd_raw/
+.vscode/
+__pycache__/
+wandb/

@@ -12,7 +12,13 @@ import time
 
 from collections import OrderedDict
 
-import apex
+APEX_AVAILABLE = True
+try:
+    import apex
+except ImportError:
+    print("Apex not available, using native PyTorch")
+    APEX_AVAILABLE = False
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -68,7 +74,7 @@ class Processor():
         self.log_feature_loss = AverageMeter()
 
         model = self.model.to(self.device)
-        if self.arg.half:
+        if self.arg.half and APEX_AVAILABLE:
             self.model, self.optimizer = apex.amp.initialize(
                 model,
                 self.optimizer,
@@ -274,7 +280,7 @@ class Processor():
 
             # backward
             self.optimizer.zero_grad()
-            if self.arg.half:
+            if self.arg.half and APEX_AVAILABLE:
                 with apex.amp.scale_loss(loss, self.optimizer) as scaled_loss:
                     scaled_loss.backward()
             else:
