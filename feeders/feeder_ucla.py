@@ -77,6 +77,8 @@ class Feeder(Dataset):
     def __getitem__(self, index):
         label = self.label[index % len(self.data_dict)]
         value = self.data[index % len(self.data_dict)]
+        
+        # print(f"value.shape:{value.shape}")
 
         if self.train_val == 'train':
             random.random()
@@ -85,20 +87,23 @@ class Feeder(Dataset):
             s = random.uniform(0.5, 1.5)
 
             center = value[0,1,:]
-            value = value - center
+            value = value - center # center the value to the first frame
             scalerValue = self.rand_view_transform(value, agx, agy, s)
+            # print(f"rand_view_transform output / scalerValue.shape:{scalerValue.shape}") # (T, 20, 3) with T changing
 
             scalerValue = np.reshape(scalerValue, (-1, 3))
+            # print(f"reshape before normalize / scalerValue.shape:{scalerValue.shape}") # (T*20, 3) with T changing
             scalerValue = (scalerValue - np.min(scalerValue,axis=0)) / (np.max(scalerValue,axis=0) - np.min(scalerValue,axis=0))
             scalerValue = scalerValue*2-1
             scalerValue = np.reshape(scalerValue, (-1, 20, 3))
+            # print(f"reshape after normalize / scalerValue.shape:{scalerValue.shape}") # (T, 20, 3) with T changing
 
-            data = np.zeros( (self.window_size, 20, 3) )
+            data = np.zeros( (self.window_size, 20, 3) ) # fixed window size
 
             value = scalerValue[:,:,:]
             length = value.shape[0]
 
-            random_idx = random.sample(list(np.arange(length))*100, self.window_size)
+            random_idx = random.sample(list(np.arange(length))*100, self.window_size) # take random (ordered)indices of the sequence to fill the window size
             random_idx.sort()
             data[:,:,:] = value[random_idx,:,:]
             data[:,:,:] = value[random_idx,:,:]
@@ -111,11 +116,11 @@ class Feeder(Dataset):
 
             center = value[0,1,:]
             value = value - center
-            scalerValue = self.rand_view_transform(value, agx, agy, s)
+            scalerValue = self.rand_view_transform(value, agx, agy, s) # augment (here no augment because angles are 0 and scale is 1)
 
             scalerValue = np.reshape(scalerValue, (-1, 3))
             scalerValue = (scalerValue - np.min(scalerValue,axis=0)) / (np.max(scalerValue,axis=0) - np.min(scalerValue,axis=0))
-            scalerValue = scalerValue*2-1
+            scalerValue = scalerValue*2-1 # normalized to [-1, 1]
 
             scalerValue = np.reshape(scalerValue, (-1, 20, 3))
 
@@ -124,19 +129,24 @@ class Feeder(Dataset):
             value = scalerValue[:,:,:]
             length = value.shape[0]
 
-            idx = np.linspace(0,length-1,self.window_size).astype(np.int32)
+            idx = np.linspace(0,length-1,self.window_size).astype(np.int32) # fill the window size by creating a sequence of indices
             data[:,:,:] = value[idx,:,:] # T,V,C
 
         if 'bone' in self.data_path:
+            print("USING BONE DATA")
+            # data is relative to the parent ??
             data_bone = np.zeros_like(data)
             for bone_idx in range(20):
                 data_bone[:, self.bone[bone_idx][0] - 1, :] = data[:, self.bone[bone_idx][0] - 1, :] - data[:, self.bone[bone_idx][1] - 1, :]
             data = data_bone
 
         if 'motion' in self.data_path:
+            print("USING MOTION DATA")
+            # data is relative to the previous frame ??
             data_motion = np.zeros_like(data)
             data_motion[:-1, :, :] = data[1:, :, :] - data[:-1, :, :]
             data = data_motion
+            
         data = np.transpose(data, (2, 0, 1))
         C,T,V = data.shape
         data = np.reshape(data,(C,T,V,1))

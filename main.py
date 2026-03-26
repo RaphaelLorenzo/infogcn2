@@ -239,8 +239,19 @@ class Processor():
         tbar = tqdm(self.data_loader['train'], dynamic_ncols=True)
 
         for x, y, mask, index in tbar:
+            
+            print(x.shape, y.shape, mask.shape, index.shape)
+            # x.shape = torch.Size([32, 3, 52, 20, 1]) i.e. B, C, T, V, M
+            # y.shape = torch.Size([32])
+            # mask.shape = torch.Size([32, 3, 52, 20, 1])
+            # index.shape = torch.Size([32])
+            
+            
             cls_loss, recon_loss, feature_loss = torch.tensor(0.), torch.tensor(0.), torch.tensor(0.)
-            B, C, T, V, M = x.shape;
+            B, C, T, V, M = x.shape
+            print(f"B:{B}, C:{C}, T:{T}, V:{V}, M:{M}")
+            
+            
             x = x.float().to(self.device)
             y = y.long().to(self.device)
             mask = mask.long().to(self.device)
