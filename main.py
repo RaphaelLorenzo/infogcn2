@@ -92,7 +92,7 @@ class Processor():
         self.data_loader['train'] = torch.utils.data.DataLoader(
             dataset=Feeder(data_path=data_path,
                 split='train',
-                p_interval=[0.5, 1],
+                p_interval=[0.5, 1], # only in NTU ? random crop
                 vel=self.arg.use_vel,
                 random_rot=self.arg.random_rot,
                 sort=False,
@@ -110,7 +110,7 @@ class Processor():
             dataset=Feeder(
                 data_path=data_path,
                 split='test',
-                p_interval=[0.95],
+                p_interval=[0.95], # only in NTU ? Center crop 
                 vel=self.arg.use_vel,
                 A=A_vector,
                 window_size=self.arg.window_size,
@@ -249,7 +249,7 @@ class Processor():
             
             cls_loss, recon_loss, feature_loss = torch.tensor(0.), torch.tensor(0.), torch.tensor(0.)
             B, C, T, V, M = x.shape
-            print(f"B:{B}, C:{C}, T:{T}, V:{V}, M:{M}")
+            # print(f"B:{B}, C:{C}, T:{T}, V:{V}, M:{M}")
             
             
             x = x.float().to(self.device)
@@ -300,10 +300,33 @@ class Processor():
             nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
             self.optimizer.step()
 
-            value, predict_label = torch.max(y_hat.data, 1)
+            value, predict_label = torch.max(y_hat.data, 1) # shape : (B,T) for each (i.e. a label per timestep !)
+            # print(f"value:{value.shape}, predict_label:{predict_label.shape}") 
+            # print(f"y_hat.shape:{y_hat.shape}, y.shape:{y.shape}, N_cls:{N_cls}, B:{B}, T:{T}, predict_label.shape:{predict_label.shape}") # N_cls is 1
+            print(predict_label)
+            # print(y)
+            
             for i, ratio in enumerate([(i+1)/10 for i in range(10)]):
+                
+                # Just to understand how to compute the accuracy for each ratio                
+                # predict_label_bool = (predict_label == y.data) # (1, B, T)
+                # # print(f"predict_label_bool:{predict_label_bool}, predict_label_bool.shape:{predict_label_bool.shape}")
+                # predict_label_bool_view = predict_label_bool.view(N_cls*B,-1) # (B, T)
+                # # print(f"predict_label_bool_view:{predict_label_bool_view}, predict_label_bool_view.shape:{predict_label_bool_view.shape}")
+                # select_index = int(math.ceil(T*ratio))-1 # 5, 10, ..., 46, 51 (i.e. the index of the timestep to take the label from)
+                # # print(f"select_index:{select_index}")
+                # acc_detailed = predict_label_bool_view[:,select_index] # (B,) True/False for the selected timestep for each sample in the batch
+                # acc_detailed_mean = acc_detailed.float().mean() # convert to float (0.0 or 1.0) and then average over the batch
+                # # print(f"acc_detailed:{acc_detailed_mean}")
+                
+                # # acc_original = (predict_label == y.data).view(N_cls*B,-1)[:,int(math.ceil(T*ratio))-1].float().mean()
+                # # print(f"acc_original:{acc_original}")
+                
                 self.log_acc[i].update((predict_label == y.data)\
                                         .view(N_cls*B,-1)[:,int(math.ceil(T*ratio))-1].float().mean(), B)
+                
+                # value:torch.Size([32, 52]), predict_label:torch.Size([32, 52])
+                
             self.log_cls_loss.update(cls_loss.data.item(), B)
             self.log_feature_loss.update(feature_loss.data.item(), B)
             self.log_recon_loss.update(recon_loss.data.item(), B)
