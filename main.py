@@ -350,6 +350,9 @@ class Processor():
         }
         train_dict.update({f"train/ACC_{(i+1)/10}":self.log_acc[i].avg for i in range(10)})
         wandb.log(train_dict)
+        
+        for i in range(10):
+            print(f"    Epoch #{epoch} Train_ACC_{(i+1)/10}: {self.log_acc[i].avg.cpu().numpy()}")
         # statistics of time consumption and loss
         if save_model:
             state_dict = self.model.state_dict()
@@ -443,6 +446,9 @@ class Processor():
             }
             eval_dict.update({f"eval/ACC_{(i+1)/10}":self.log_acc[i].avg for i in range(10)})
             wandb.log(eval_dict)
+            
+            for i in range(10):
+                print(f"    Epoch #{epoch} Eval_ACC_{(i+1)/10}: {self.log_acc[i].avg.cpu().numpy()}")
 
             score = np.concatenate(score_frag)
 
