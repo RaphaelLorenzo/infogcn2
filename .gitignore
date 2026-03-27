@@ -3,3 +3,7 @@ data/nturgbd_raw/
 .vscode/
 __pycache__/
 wandb/
+denoised_data/
+*.npz
+data/ntu/denoised_data/
+data/ntu/raw_data/

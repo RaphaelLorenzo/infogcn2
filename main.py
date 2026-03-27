@@ -240,7 +240,7 @@ class Processor():
 
         for x, y, mask, index in tbar:
             
-            print(x.shape, y.shape, mask.shape, index.shape)
+            # print(x.shape, y.shape, mask.shape, index.shape)
             # x.shape = torch.Size([32, 3, 52, 20, 1]) i.e. B, C, T, V, M
             # y.shape = torch.Size([32])
             # mask.shape = torch.Size([32, 3, 52, 20, 1])
@@ -303,7 +303,7 @@ class Processor():
             value, predict_label = torch.max(y_hat.data, 1) # shape : (B,T) for each (i.e. a label per timestep !)
             # print(f"value:{value.shape}, predict_label:{predict_label.shape}") 
             # print(f"y_hat.shape:{y_hat.shape}, y.shape:{y.shape}, N_cls:{N_cls}, B:{B}, T:{T}, predict_label.shape:{predict_label.shape}") # N_cls is 1
-            print(predict_label)
+            # print(predict_label)
             # print(y)
             
             for i, ratio in enumerate([(i+1)/10 for i in range(10)]):
