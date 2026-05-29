@@ -88,6 +88,9 @@ def get_parser():
     parser.add_argument('--n_min', type=int, default=3, help='')
     parser.add_argument('--dilation', type=int, default=1, help='')
     parser.add_argument('--ode_method', type=str, default="euler", help='')
+    
+    # partial load (float)
+    parser.add_argument('--partial_load', type=float, default=1.0, help='partial load ratio')
 
     return parser
 

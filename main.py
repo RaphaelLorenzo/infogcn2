@@ -98,6 +98,7 @@ class Processor():
                 sort=False,
                 A=A_vector,
                 window_size=self.arg.window_size,
+                partial_load=self.arg.partial_load
             ),
             batch_size=self.arg.batch_size,
             shuffle=True,

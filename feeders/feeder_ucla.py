@@ -8,7 +8,7 @@ from torch.utils.data import Dataset
 
 class Feeder(Dataset):
     def __init__(self, data_path, split=None, p_interval=None, repeat=5, random_choose=False, random_shift=False, random_move=False, random_rot=False,
-                 window_size=52, normalization=False, debug=False, use_mmap=True, bone=False, vel=False, sort=False, A=None):
+                 window_size=52, normalization=False, debug=False, use_mmap=True, bone=False, vel=False, sort=False, A=None, partial_load=1.0):
 
         if 'test' in split:
             self.train_val = 'test'
@@ -35,6 +35,8 @@ class Feeder(Dataset):
         self.use_mmap = use_mmap
         self.repeat = repeat if split=="train" else 1
         self.A = A
+        self.partial_load = partial_load
+        assert(partial_load == 1.0), "Only partial load of 1.0 supported to NW UCLA for now"
         self.load_data()
         if normalization:
             self.get_mean_map()

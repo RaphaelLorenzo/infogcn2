@@ -9,7 +9,7 @@ from feeders import tools
 class Feeder(Dataset):
     def __init__(self, data_path, label_path=None, p_interval=1, split='train', repeat=1, random_choose=False, random_shift=False,
                  random_move=False, random_rot=False, window_size=64, normalization=False, debug=False, use_mmap=False,
-                 vel=False, sort=False, A=None):
+                 vel=False, sort=False, A=None, partial_load=1.0):
         """
         :param data_path:
         :param label_path:
@@ -40,6 +40,7 @@ class Feeder(Dataset):
         self.random_rot = random_rot
         self.vel = vel
         self.A = A
+        self.partial_load = partial_load
         self.load_data()
         if sort:
             self.get_n_per_class()
@@ -87,7 +88,7 @@ class Feeder(Dataset):
         self.std_map = data.transpose((0, 2, 4, 1, 3)).reshape((N * T * M, C * V)).std(axis=0).reshape((C, 1, V, 1))
 
     def __len__(self):
-        return len(self.label)
+        return int(len(self.label) * self.partial_load)
 
     def __iter__(self):
         return self
