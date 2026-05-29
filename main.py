@@ -474,7 +474,7 @@ class Processor():
             for epoch in range(self.arg.start_epoch, self.arg.num_epoch):
                 save_model = (epoch + 1 > self.arg.save_epoch)
                 self.train(epoch, save_model=save_model)
-                if epoch > self.arg.save_epoch and epoch % self.arg.eval_interval == 0:
+                if epoch > self.arg.save_epoch and (epoch % self.arg.eval_interval == 0 or epoch == self.arg.num_epoch - 1):
                     self.eval(epoch, save_score=self.arg.save_score, loader_name=['test'])
             self.arg.print_log = True
 
