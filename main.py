@@ -115,6 +115,7 @@ class Processor():
                 vel=self.arg.use_vel,
                 A=A_vector,
                 window_size=self.arg.window_size,
+                partial_load=1.0
             ),
             batch_size=self.arg.test_batch_size,
             shuffle=False,
@@ -473,7 +474,7 @@ class Processor():
             for epoch in range(self.arg.start_epoch, self.arg.num_epoch):
                 save_model = (epoch + 1 > self.arg.save_epoch)
                 self.train(epoch, save_model=save_model)
-                if epoch > self.arg.save_epoch:
+                if epoch > self.arg.save_epoch and epoch % self.arg.eval_interval == 0:
                     self.eval(epoch, save_score=self.arg.save_score, loader_name=['test'])
             self.arg.print_log = True
 
