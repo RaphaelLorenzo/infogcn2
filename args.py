@@ -91,7 +91,6 @@ def get_parser():
     
     # partial load (float)
     parser.add_argument('--partial_load', type=float, default=1.0, help='partial load ratio')
-    parser.add_argument('--permutation_seed', type=int, default=42, help='permutation seed for shuffling')
 
     return parser
 

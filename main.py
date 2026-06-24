@@ -99,7 +99,6 @@ class Processor():
                 A=A_vector,
                 window_size=self.arg.window_size,
                 partial_load=self.arg.partial_load,
-                permutation_seed=self.arg.permutation_seed
             ),
             batch_size=self.arg.batch_size,
             shuffle=True,

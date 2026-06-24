@@ -9,7 +9,7 @@ from feeders import tools
 class Feeder(Dataset):
     def __init__(self, data_path, label_path=None, p_interval=1, split='train', repeat=1, random_choose=False, random_shift=False,
                  random_move=False, random_rot=False, window_size=64, normalization=False, debug=False, use_mmap=False,
-                 vel=False, sort=False, A=None, partial_load=1.0, permutation_seed=42):
+                 vel=False, sort=False, A=None, partial_load=1.0):
         """
         :param data_path:
         :param label_path:
@@ -41,7 +41,6 @@ class Feeder(Dataset):
         self.vel = vel
         self.A = A
         self.partial_load = partial_load            
-        self.permutation_seed = permutation_seed
         self.load_data()
         
         if partial_load < 1.0:
@@ -83,7 +82,7 @@ class Feeder(Dataset):
         self.csum_n_per_cls = np.insert(np.cumsum(self.n_per_cls), 0, 0)
 
     def shuffle(self):
-        shuffled_idx = np.random.permutation(len(self.label), seed=self.permutation_seed)
+        shuffled_idx = np.random.permutation(len(self.label))
         self.data = self.data[shuffled_idx]
         self.label = self.label[shuffled_idx]
     
